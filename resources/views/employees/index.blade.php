@@ -58,6 +58,13 @@
             vertical-align: middle;
             font-size: 13px;
         }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+        }
     </style>
 </head>
 
@@ -82,12 +89,34 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
                 <div>
                     <h3>Employee Management</h3>
-                    <p class="text-muted mb-0">Manage employee information and assigned equipment.</p>
+                    <p class="text-muted mb-0">
+                        Manage employee information and assigned equipment.
+                    </p>
                 </div>
 
-                <a href="{{ route('employees.create') }}" class="btn btn-primary">
-                    + Add Employee
-                </a>
+              <div class="d-flex flex-wrap gap-2">
+
+    <a href="{{ route('employees.export.csv', request()->query()) }}"
+       class="btn btn-success">
+        Export CSV
+    </a>
+
+    <a href="{{ route('employees.export.pdf', request()->query()) }}"
+       class="btn btn-danger">
+        Export PDF
+    </a>
+
+    <a href="{{ route('employees.print', request()->query()) }}"
+       class="btn btn-outline-dark"
+       target="_blank">
+        Print
+    </a>
+
+    <a href="{{ route('employees.create') }}" class="btn btn-primary">
+        + Add Employee
+    </a>
+
+</div>
             </div>
 
             @if(session('success'))
@@ -112,9 +141,156 @@
                 </div>
             @endif
 
+            <!-- Advanced Search and Filters -->
+            <div class="content-card mb-4">
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div>
+                        <h5 class="mb-1">Advanced Search & Filters</h5>
+                        <small class="text-muted">
+                            Search and filter employee records.
+                        </small>
+                    </div>
+                </div>
+
+                <form method="GET" action="{{ route('employees.index') }}">
+
+                    <!-- Search -->
+                    <div class="mb-3">
+                        <label class="filter-label">Search Employee</label>
+
+                        <input
+                            type="text"
+                            name="search"
+                            class="form-control"
+                            placeholder="Search by employee name, ID, position, or office..."
+                            value="{{ $filters['search'] ?? '' }}"
+                        >
+                    </div>
+
+                    <div class="row g-3">
+
+                        <!-- Status Filter -->
+                        <div class="col-md-6 col-lg-3">
+                            <label class="filter-label">Employee Status</label>
+
+                            <select name="status" class="form-select">
+                                <option value="">All Statuses</option>
+
+                                <option value="Active"
+                                    @selected(($filters['status'] ?? '') === 'Active')>
+                                    Active
+                                </option>
+
+                                <option value="Inactive"
+                                    @selected(($filters['status'] ?? '') === 'Inactive')>
+                                    Inactive
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Office Filter -->
+                        <div class="col-md-6 col-lg-3">
+                            <label class="filter-label">Office / Department</label>
+
+                            <select name="office" class="form-select">
+                                <option value="">All Offices</option>
+
+                                @foreach($offices as $office)
+                                    <option value="{{ $office }}"
+                                        @selected(($filters['office'] ?? '') === $office)>
+                                        {{ $office }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Equipment Filter -->
+                        <div class="col-md-6 col-lg-3">
+                            <label class="filter-label">Assigned Equipment</label>
+
+                            <select name="equipment" class="form-select">
+                                <option value="">All Employees</option>
+
+                                <option value="with_equipment"
+                                    @selected(($filters['equipment'] ?? '') === 'with_equipment')>
+                                    With Equipment
+                                </option>
+
+                                <option value="without_equipment"
+                                    @selected(($filters['equipment'] ?? '') === 'without_equipment')>
+                                    Without Equipment
+                                </option>
+
+                                <option value="with_computers"
+                                    @selected(($filters['equipment'] ?? '') === 'with_computers')>
+                                    With Computers
+                                </option>
+
+                                <option value="with_printers"
+                                    @selected(($filters['equipment'] ?? '') === 'with_printers')>
+                                    With Printers
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Sorting -->
+                        <div class="col-md-6 col-lg-3">
+                            <label class="filter-label">Sort By</label>
+
+                            <select name="sort" class="form-select">
+                                <option value="newest"
+                                    @selected(($filters['sort'] ?? 'newest') === 'newest')>
+                                    Newest First
+                                </option>
+
+                                <option value="oldest"
+                                    @selected(($filters['sort'] ?? '') === 'oldest')>
+                                    Oldest First
+                                </option>
+
+                                <option value="name_asc"
+                                    @selected(($filters['sort'] ?? '') === 'name_asc')>
+                                    Name A-Z
+                                </option>
+
+                                <option value="name_desc"
+                                    @selected(($filters['sort'] ?? '') === 'name_desc')>
+                                    Name Z-A
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+
+                        <button type="submit" class="btn btn-primary">
+                            Search & Apply Filters
+                        </button>
+
+                        <a href="{{ route('employees.index') }}"
+                           class="btn btn-outline-secondary">
+                            Clear Filters
+                        </a>
+
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Employee Records -->
             <div class="content-card">
 
-                <h5 class="mb-3">Employee Records</h5>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div>
+                        <h5 class="mb-1">Employee Records</h5>
+                        <small class="text-muted">
+                            Showing {{ $employees->count() }} employee(s).
+                        </small>
+                    </div>
+                </div>
 
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -138,12 +314,7 @@
                                 <tr>
                                     <td>{{ $employee->employee_id }}</td>
 
-                                    <td>
-                                        <a href="{{ route('employees.show', $employee->id) }}"
-                                           class="text-decoration-none fw-semibold">
-                                            {{ $employee->full_name }}
-                                        </a>
-                                    </td>
+                                    <td>{{ $employee->full_name }}</td>
 
                                     <td>{{ $employee->position ?? '-' }}</td>
 
@@ -185,25 +356,13 @@
                                             Edit
                                         </a>
 
-                                        <form action="{{ route('employees.destroy', $employee->id) }}"
-                                              method="POST"
-                                              class="d-inline"
-                                              onsubmit="return confirm('Are you sure you want to delete this employee?')">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                Delete
-                                            </button>
-                                        </form>
-
                                     </td>
                                 </tr>
 
                             @empty
                                 <tr>
                                     <td colspan="9" class="text-center text-muted py-4">
-                                        No employees registered yet.
+                                        No employees found matching your search or filters.
                                     </td>
                                 </tr>
                             @endforelse

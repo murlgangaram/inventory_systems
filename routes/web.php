@@ -119,6 +119,17 @@ Route::get('/dashboard', function () {
     Route::get('/equipment', [EquipmentController::class, 'index'])
         ->name('equipment.index');
 
+        // Export equipment records to CSV.
+Route::get('/equipment/export/csv', [EquipmentController::class, 'exportCsv'])
+    ->name('equipment.export.csv');
+
+// Print equipment records.
+Route::get('/equipment/print', [EquipmentController::class, 'print'])
+    ->name('equipment.print');
+
+    Route::get('/equipment/export/pdf', [EquipmentController::class, 'exportPdf'])
+    ->name('equipment.export.pdf');
+
     // Super Admin and Admin can create and edit equipment.
     Route::middleware('role:super_admin,admin')->group(function () {
         Route::get('/equipment/create', [EquipmentController::class, 'create'])
@@ -139,11 +150,7 @@ Route::get('/dashboard', function () {
         ->middleware('role:super_admin')
         ->name('equipment.destroy');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Employee Management
-    |--------------------------------------------------------------------------
-    */
+
 
   /*
 |--------------------------------------------------------------------------
@@ -154,9 +161,24 @@ Route::get('/dashboard', function () {
 // All authenticated users can view the employee list.
 Route::get('/employees', [EmployeeController::class, 'index'])
     ->name('employees.index');
+    // Export employee records to CSV.
+Route::get('/employees/export/csv', [EmployeeController::class, 'exportCsv'])
+    ->name('employees.export.csv');
+
+// Export employee records to PDF.
+Route::get('/employees/export/pdf', [EmployeeController::class, 'exportPdf'])
+    ->name('employees.export.pdf');
+
+// Print employee records.
+Route::get('/employees/print', [EmployeeController::class, 'print'])
+    ->name('employees.print');
 
 // Super Admin and Admin can create and edit employees.
 Route::middleware('role:super_admin,admin')->group(function () {
+    // Change employee status (Active / Inactive).
+Route::patch('/employees/{id}/status', [EmployeeController::class, 'updateStatus'])
+    ->whereNumber('id')
+    ->name('employees.updateStatus');
 
     Route::get('/employees/create', [EmployeeController::class, 'create'])
         ->name('employees.create');
@@ -175,12 +197,6 @@ Route::middleware('role:super_admin,admin')->group(function () {
 Route::get('/employees/{id}', [EmployeeController::class, 'show'])
     ->whereNumber('id')
     ->name('employees.show');
-
-// Only Super Admin can delete employees.
-Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])
-    ->middleware('role:super_admin')
-    ->whereNumber('id')
-    ->name('employees.destroy');
 
     /*
     |--------------------------------------------------------------------------

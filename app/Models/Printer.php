@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Printer extends Model
 {
@@ -28,5 +29,15 @@ class Printer extends Model
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
+    /**
+     * A printer can have multiple assignment history records.
+     */
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(EquipmentAssignment::class, 'equipment_id')
+            ->where('equipment_type', 'printer')
+            ->orderByDesc('assigned_at');
     }
 }

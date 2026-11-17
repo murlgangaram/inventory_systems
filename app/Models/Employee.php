@@ -31,7 +31,7 @@ class Employee extends Model
     }
 
     /**
-     * An employee can have multiple computers.
+     * An employee can have multiple currently assigned computers.
      */
     public function computers(): HasMany
     {
@@ -39,10 +39,19 @@ class Employee extends Model
     }
 
     /**
-     * An employee can have multiple printers.
+     * An employee can have multiple currently assigned printers.
      */
     public function printers(): HasMany
     {
         return $this->hasMany(Printer::class, 'employee_id');
+    }
+
+    /**
+     * An employee can have multiple current and previous equipment assignments.
+     */
+    public function equipmentAssignments(): HasMany
+    {
+        return $this->hasMany(EquipmentAssignment::class, 'employee_id')
+            ->orderByDesc('assigned_at');
     }
 }

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+
 
 class LoginController extends Controller
 {
@@ -37,15 +39,25 @@ class LoginController extends Controller
             ]);
         }
 
-        $credentials['status'] = 'Active';
+       $credentials['status'] = 'Active';
 
-        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
-            RateLimiter::hit($key, 60);
+// Check whether the account belongs to an active employee.
+$employeeIsActive = Account::where('username', $credentials['username'])
+    ->whereHas('employee', function ($query) {
+        $query->where('status', 'Active');
+    })
+    ->exists();
 
-            throw ValidationException::withMessages([
-                'username' => 'Invalid username or password, or your account is disabled.',
-            ]);
-        }
+if (
+    !$employeeIsActive ||
+    !Auth::attempt($credentials, $request->boolean('remember'))
+) {
+    RateLimiter::hit($key, 60);
+
+    throw ValidationException::withMessages([
+        'username' => 'Invalid username or password, or your account is disabled.',
+    ]);
+}
 
         RateLimiter::clear($key);
 
