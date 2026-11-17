@@ -370,6 +370,25 @@
 
                     </table>
                 </div>
+                                    </table>
+                </div>
+
+                {{-- Employee Pagination --}}
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+
+                    <div class="text-muted small">
+                        Showing {{ $employees->firstItem() ?? 0 }}
+                        to {{ $employees->lastItem() ?? 0 }}
+                        of {{ $employees->total() }} employees
+                    </div>
+
+                    <div>
+                        {{ $employees->links('pagination::bootstrap-5') }}
+                    </div>
+
+                </div>
+
+            </div>
 
             </div>
 

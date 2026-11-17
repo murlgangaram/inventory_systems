@@ -193,6 +193,11 @@ Route::patch('/employees/{id}/status', [EmployeeController::class, 'updateStatus
         ->name('employees.update');
 });
 
+// View employee status history.
+Route::get('/employees/{id}/status-history', [EmployeeController::class, 'statusHistory'])
+    ->whereNumber('id')
+    ->name('employees.statusHistory');
+    
 // All authenticated users can view employee details.
 Route::get('/employees/{id}', [EmployeeController::class, 'show'])
     ->whereNumber('id')

@@ -97,14 +97,19 @@
             </button>
 
             <a href="{{ route('employees.edit', $employee->id) }}"
-               class="btn btn-primary">
-                Edit Employee
-            </a>
+   class="btn btn-primary">
+    Edit Employee
+</a>
 
-            <a href="{{ route('employees.index') }}"
-               class="btn btn-outline-secondary">
-                Back
-            </a>
+<a href="{{ route('employees.statusHistory', $employee->id) }}"
+   class="btn btn-outline-info">
+    Status History
+</a>
+
+<a href="{{ route('employees.index') }}"
+   class="btn btn-outline-secondary">
+    Back
+</a>
 
         </div>
 
@@ -124,7 +129,10 @@
         </div>
 
         <div class="col-md-4">
-            <div class="summary-card bg-white">
+            <div class="summary-card bg-white"><a href="{{ route('employees.edit', $employee->id) }}"
+   class="btn btn-primary">
+    Edit Employee
+</a>
                 <div class="text-muted small">Assigned Printers</div>
                 <div class="summary-number text-success">
                     {{ $employee->printers->count() }}

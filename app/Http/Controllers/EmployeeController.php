@@ -275,7 +275,7 @@ private function getEmployeeFilters(Request $request): array
                 break;
         }
 
-        $employees = $query->get();
+      $employees = $query->paginate(10)->withQueryString();
 
         // Get available offices for the filter dropdown.
         $offices = Employee::query()
@@ -482,7 +482,25 @@ public function updateStatus(Request $request, string $id)
             "Employee status changed from {$oldStatus} to {$newStatus} successfully."
         );
 }
+/**
+ * Display an employee's status change history.
+ */
+public function statusHistory(string $id)
+{
+    $employee = Employee::findOrFail($id);
 
+    $statusHistory = \App\Models\ActivityLog::with('account')
+        ->where('module', 'Employees')
+        ->where('action', 'Status Changed')
+        ->where('record_id', $employee->id)
+        ->latest()
+        ->paginate(10);
+
+    return view('employees.status-history', compact(
+        'employee',
+        'statusHistory'
+    ));
+}
     /**
      * Display employee details and assigned equipment.
      */
